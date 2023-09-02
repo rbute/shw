@@ -1,0 +1,39 @@
+#!/bin/bash
+command -v curl >/dev/null || echo "curl Command doesn't exist. Please install curl before running shwi" || exit 1
+
+BIN_PATH=~/.shw/bin
+SHELL_PROFILE=""
+UNINSTALL=false
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  -b | --binpath)
+    BIN_PATH="$2"
+    shift
+    shift
+    ;;
+  -u | --uninstall)
+    UNINSTALL=true
+    shift
+    ;;
+  -*,--*)
+    echo "Unknown option $1"
+    exit 1
+    ;;
+  esac
+done
+
+FILE=$BIN_PATH/shw
+SHELL_PROFILE=~/.bash_profile
+
+if [ $UNINSTALL == "true" ]; then
+  sed "s/*INSERTED_BY_SHW*//"
+fi
+
+if ! [ -d $BIN_PATH ]; then
+  mkdir -p $BIN_PATH
+fi
+
+curl -XGET -Ls $URL --output $FILE &&
+  chmod +x $FILE &&
+  echo " [ \$PATH == *\"$BIN_PATH\"* ] || export PATH=\$PATH:$BIN_PATH #Please do not modify, INSERTED_BY_SHW " >>$SHELL_PROFILE
